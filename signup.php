@@ -1,4 +1,5 @@
 <?php session_start() ?>
+
 <div class="container-fluid">
 	<form action="" id="signup-frm">
 		<div class="form-group">
@@ -23,36 +24,53 @@
 		</div>
 		<div class="form-group">
 			<label for="" class="control-label">Password</label>
-			<input type="password" name="password" required="" class="form-control">
+			<input type="password" name="password" required="" class="form-control" onkeyup="checkPasswordStrength();">
 		</div>
 		<button class="button btn btn-info btn-sm">Create</button>
 	</form>
 </div>
 
 <style>
-	#uni_modal .modal-footer{
-		display:none;
+	#uni_modal .modal-footer {
+		display: none;
 	}
 </style>
 <script>
-	$('#signup-frm').submit(function(e){
+	function checkPasswordStrength() {
+		var password = document.querySelector('[name="password"]').value;
+		var message = document.getElementById('password-message');
+		if (!message) {
+			message = document.createElement('div');
+			message.id = 'password-message';
+			document.querySelector('[name="password"]').parentNode.appendChild(message);
+		}
+		var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!_@#$%^&*])(?=.{8,})");
+		if (strongRegex.test(password)) {
+			message.innerHTML = '<span style="color: green;">Strong password.</span>';
+			return true;
+		} else {
+			message.innerHTML = '<span style="color: red;">Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one number, and one special character.</span>';
+			return false;
+		}
+	}
+	$('#signup-frm').submit(function(e) {
 		e.preventDefault()
-		$('#signup-frm button[type="submit"]').attr('disabled',true).html('Saving...');
-		if($(this).find('.alert-danger').length > 0 )
+		$('#signup-frm button[type="submit"]').attr('disabled', true).html('Saving...');
+		if ($(this).find('.alert-danger').length > 0)
 			$(this).find('.alert-danger').remove();
 		$.ajax({
-			url:'admin/ajax.php?action=signup',
-			method:'POST',
-			data:$(this).serialize(),
-			error:err=>{
+			url: 'admin/ajax.php?action=signup',
+			method: 'POST',
+			data: $(this).serialize(),
+			error: err => {
 				console.log(err)
-		$('#signup-frm button[type="submit"]').removeAttr('disabled').html('Create');
+				$('#signup-frm button[type="submit"]').removeAttr('disabled').html('Create');
 
 			},
-			success:function(resp){
-				if(resp == 1){
-					location.href ='<?php echo isset($_GET['redirect']) ? $_GET['redirect'] : 'index.php?page=home' ?>';
-				}else{
+			success: function(resp) {
+				if (resp == 1) {
+					location.href = '<?php echo isset($_GET['redirect']) ? $_GET['redirect'] : 'index.php?page=home' ?>';
+				} else {
 					$('#signup-frm').prepend('<div class="alert alert-danger">Email already exist.</div>')
 					$('#signup-frm button[type="submit"]').removeAttr('disabled').html('Create');
 				}

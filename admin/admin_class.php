@@ -3,7 +3,6 @@ session_start();
 
 class Action
 {
-
 	private $db;
 
 	public function __construct()
@@ -123,8 +122,6 @@ class Action
 	{
 		extract($_POST);
 		$password = password_hash($password, PASSWORD_DEFAULT);
-
-		// Prepare a statement to check if the email already exists
 		$stmt = $this->db->prepare("SELECT * FROM user_info WHERE email = ?");
 		$stmt->bind_param("s", $email);
 		$stmt->execute();
@@ -135,7 +132,7 @@ class Action
 		}
 		$stmt->close();
 
-		// Prepare a statement to insert new user info
+
 		$stmt = $this->db->prepare("INSERT INTO user_info (first_name, last_name, mobile, address, email, password) VALUES (?, ?, ?, ?, ?, ?)");
 		$stmt->bind_param("ssssss", $first_name, $last_name, $mobile, $address, $email, $password);
 		$execute = $stmt->execute();
@@ -149,6 +146,7 @@ class Action
 			return 3; // Database insertion failed
 		}
 	}
+
 
 
 	function save_settings()
